@@ -6,12 +6,12 @@ import numpy as np
 from stable_baselines3.common.evaluation import evaluate_policy
 import os
 import csv
-from utils.init_pos_config import get_init_list, get_param_names, is_valid_env, get_available_envs, assert_alarm
+from utils.init_pos_config import get_init_list, get_param_names, assert_alarm
 from collections import defaultdict
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-l", "--log_model", help="model to be logged", type=str)
-parser.add_argument("-e", "--environment", help="which my- env been used", type=str, default="PendulumFixPos-v0")
+parser.add_argument("-e", "--environment", help="which my- env been used", type=str, required=True)
 parser.add_argument("-p", "--prefix", type=str, default="", help="prefix_name")
 parser.add_argument("-s", "--save_dir", help="directory to save plots", type=str, required=True)
 args = parser.parse_args()

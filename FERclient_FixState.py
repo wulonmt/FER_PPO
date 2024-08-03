@@ -26,7 +26,7 @@ def paser_argument():
     parser = argparse.ArgumentParser()
     parser.add_argument("-l", "--log_name", help="modified log name", type=str, default ="auto")
     parser.add_argument("-s", "--save_log", help="whether save log or not", type=str, default = "True") #parser can't pass bool
-    parser.add_argument("-e", "--environment", help="which my- env been used", type=str, default="PendulumFixPos-v0")
+    parser.add_argument("-e", "--environment", help="which my- env been used", type=str, required=True)
     # parser.add_argument("-e", "--environment", help="which my- env been used", type=str, default="Pendulum-v0")
     parser.add_argument("-t", "--train", help="training or not", type=str, default = "True")
     parser.add_argument("-r", "--render_mode", help="h for human & r for rgb_array", type=str, default = "r")

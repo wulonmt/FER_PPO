@@ -13,13 +13,15 @@ import requests
 import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-m", "--model_name", help="modified model name", type=str, nargs='?')
 parser.add_argument("-p", "--port", help="local port", type=str, default="8080")
+parser.add_argument("-r", "--rounds", help="total rounds", type=int, default=300)
+parser.add_argument("-c", "--clients", help="number of clients", type=int, default=2)
 args = parser.parse_args()
 
 def main():
-    total_rounds = 2
-    clients = 2
+    total_rounds = args.rounds
+    clients = args.clients
+    print(f"Starting Server, total rounds {total_rounds}, clients {clients}")
     # Decorated strategy
     strategy = FedAvg(min_fit_clients=clients,
                       min_evaluate_clients=clients,

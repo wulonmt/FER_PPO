@@ -12,7 +12,7 @@ from utils.init_pos_config import get_init_pos, get_init_list, assert_alarm
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-l", "--log_model", help="modle to be logged", type=str)
-parser.add_argument("-e", "--environment", help="which my- env been used", type=str, default="PendulumFixPos-v0")
+parser.add_argument("-e", "--environment", help="which my- env been used", type=str, required=True)
 args = parser.parse_args()
 RECORD = True
 SNAPSHOT = False
