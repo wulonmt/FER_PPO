@@ -8,8 +8,6 @@ dependencies:
   - python=3.9.19
   - setuptools=65.6.3
   - sqlite=3.45.3
-  - vc=14.2
-  - vs2015_runtime=14.29.30133
   - wheel=0.38.4
   - wincertstore=0.2
   - pip:
