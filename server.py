@@ -1,8 +1,9 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import flwr as fl
-from flwr.common import Metrics
+from flwr.common import Metrics, FitIns
 from flwr.common.typing import Parameters
+from flwr.server.client_manager import ClientManager
 from flwr.common.parameter import ndarrays_to_parameters, parameters_to_ndarrays
 from flwr.common.typing import GetParametersIns
 from flwr.server.utils.tensorboard import tensorboard
@@ -14,8 +15,6 @@ import sys
 import numpy as np
 from utils.Ptime import Ptime
 import os
-
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--port", help="local port", type=str, default="8080")
@@ -38,11 +37,20 @@ def save_model(parameters: Parameters, save_dir: str, filename: str = "final_mod
     np.savez(file_path, *ndarrays)
     print(f"Model saved to {file_path}")
 
+def aggregate_log_std(metrics: List[Tuple[int, Metrics]]) -> Dict[str, float]:
+    total_samples = sum([num_samples for num_samples, _ in metrics])
+    weighted_special_param = sum(
+        [num_samples * m["log_std"] for num_samples, m in metrics]
+    )
+    breakpoint()
+    return {"log_std": weighted_special_param / total_samples}
+
 class SaveModelStrategy(FedAvg):
     def __init__(self, save_dir: str, num_rounds: int, **kwargs):
         super().__init__(**kwargs)
         self.save_dir = save_dir
         self.num_rounds = num_rounds
+        self.aggregated_log_std = 0.0
 
     def aggregate_fit(
         self,
@@ -52,12 +60,40 @@ class SaveModelStrategy(FedAvg):
     ) -> Tuple[Parameters, dict]:
         # Aggregate parameters and metrics using the super class method
         parameters, metrics = super().aggregate_fit(server_round, results, failures)
-
+        if parameters is not None:
+            # 聚合特殊參數
+            fit_metrics = [(fit_res.num_examples, fit_res.metrics) for _, fit_res in results]
+            breakpoint()
+            aggregated_metrics = aggregate_log_std(fit_metrics)
+            print(f"Round {server_round} aggregated log std: {aggregated_metrics['log_std']}")
+        
         # Save the model after the final round
         if server_round == self.num_rounds:
             save_model(parameters, self.save_dir, f"final_model_round_{server_round}.npz")
 
         return parameters, metrics
+    
+    def configure_fit(
+        self, server_round: int, parameters: Parameters, client_manager: ClientManager
+    ) -> List[Tuple[fl.server.client_proxy.ClientProxy, FitIns]]:        
+        config = {}
+        if self.on_fit_config_fn is not None:
+            # Custom fit config function provided
+            config = self.on_fit_config_fn(server_round)
+            # 加入聚合的log_std
+        config["log_std"] = self.aggregated_log_std
+        print("config in config_fit: ", config)
+        fit_ins = FitIns(parameters, config)
+
+        # Sample clients
+        sample_size, min_num_clients = self.num_fit_clients(
+            client_manager.num_available()
+        )
+        clients = client_manager.sample(
+            num_clients=sample_size, min_num_clients=min_num_clients
+        )
+
+        return [(client, fit_ins) for client in clients]
 
 def main():
     total_rounds = args.rounds

@@ -112,6 +112,24 @@ class FixPosClient(fl.client.NumPyClient):
         self.model.regul_policy.load_state_dict(state_dict, strict=True)
 
     def fit(self, parameters, config):
+
+        if "log_std" in config:
+            received_log_std = config["log_std"]
+            print(f"Received log std: {received_log_std}")
+            
+            # 確保 received_log_std 是一個浮點數
+            if isinstance(received_log_std, (list, np.ndarray)):
+                received_log_std = received_log_std[0]  # 假設我們只需要第一個元素
+                received_log_std = float(received_log_std)
+                
+            # 使用 torch.nn.Parameter 的 data 屬性來更新值
+            with torch.no_grad():  # 防止在更新過程中創建計算圖
+                self.model.policy.log_std.data = torch.tensor([received_log_std], dtype=self.model.policy.log_std.dtype, device=self.model.policy.log_std.device)
+    
+            print(f"Updated log_std: {self.model.policy.log_std}")
+        else:
+            print(f"No log std received {config = }")
+
         self.n_round += 1
         self.set_parameters(parameters)
         if("learning_rate" in config.keys()):
@@ -127,7 +145,7 @@ class FixPosClient(fl.client.NumPyClient):
             print("log name: ", self.tensorboard_log + self.log_name)
             self.model.save(self.tensorboard_log + self.log_name + "/model")
             
-        return self.get_parameters(config={}), self.model.num_timesteps, {}
+        return self.get_parameters(config={}), self.model.num_timesteps, {"log_std": self.model.policy.log_std.item()}
 
     def evaluate(self, parameters, config):
         print("evaluating model")
