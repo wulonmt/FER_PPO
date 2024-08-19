@@ -92,7 +92,6 @@ class FixPosClient(fl.client.NumPyClient):
         # print(self.model.policy)
         # print(self.model.policy.state_dict().keys())
         # print([key for key, value in self.model.policy.state_dict().items() if "policy_net" in key])
-        # breakpoint()
         policy_state = [value.cpu().numpy() for key, value in self.model.policy.state_dict().items()]
         # policy_state = [value.cpu().numpy() for key, value in self.model.policy.state_dict().items() if "policy_net" in key]
         return policy_state

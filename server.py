@@ -42,7 +42,6 @@ def aggregate_log_std(metrics: List[Tuple[int, Metrics]]) -> Dict[str, float]:
     weighted_special_param = sum(
         [num_samples * m["log_std"] for num_samples, m in metrics]
     )
-    breakpoint()
     return {"log_std": weighted_special_param / total_samples}
 
 class SaveModelStrategy(FedAvg):
@@ -63,7 +62,6 @@ class SaveModelStrategy(FedAvg):
         if parameters is not None:
             # 聚合特殊參數
             fit_metrics = [(fit_res.num_examples, fit_res.metrics) for _, fit_res in results]
-            breakpoint()
             aggregated_metrics = aggregate_log_std(fit_metrics)
             print(f"Round {server_round} aggregated log std: {aggregated_metrics['log_std']}")
         
