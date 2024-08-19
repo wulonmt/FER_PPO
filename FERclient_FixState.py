@@ -32,9 +32,10 @@ def paser_argument():
     parser.add_argument("-r", "--render_mode", help="h for human & r for rgb_array", type=str, default = "r")
     parser.add_argument("-i", "--index", help="client index", type=int, default = 0, required = True)
     parser.add_argument("-p", "--port", help="local port", type=str, default="8080")
+    parser.add_argument("-m", "--time_step", help="training time steps", type=int, default=5e3)
     return parser.parse_args()
 
-class MountainCarFixPosClient(fl.client.NumPyClient):
+class FixPosClient(fl.client.NumPyClient):
     def __init__(self, client_index, args=None):
         
         rm = "rgb_array" if args.render_mode == "r" else "human"
@@ -117,7 +118,7 @@ class MountainCarFixPosClient(fl.client.NumPyClient):
             self.model.learning_rate = config["learning_rate"]
         print(f"Training learning rate: {self.model.learning_rate}")
         # Train the agent
-        self.model.learn(total_timesteps=int(5e3),
+        self.model.learn(total_timesteps=self.args.time_step,
                          tb_log_name=(self.log_name + f"/round_{self.n_round}" if self.n_round>9 else self.log_name + f"/round_0{self.n_round}") if self.log_name is not None else None ,
                          reset_num_timesteps=False,
                          )
@@ -136,13 +137,13 @@ class MountainCarFixPosClient(fl.client.NumPyClient):
         print("after evaluate policy")
         return -reward_mean, self.model.num_timesteps, {"reward mean": reward_mean, "reward std": reward_std}
 
-def main():        
+def main():
     args = paser_argument()
     assert_alarm(args.environment)
 
     # Start Flower client
     #port = 8080 + args.index
-    client = MountainCarFixPosClient(args.index, args=args)
+    client = FixPosClient(args.index, args=args)
     fl.client.start_client(
         server_address=f"127.0.0.1:" + args.port,
         client=client.to_client(),
