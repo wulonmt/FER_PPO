@@ -29,7 +29,7 @@ def process_folder(folder_path, prefix):
         else:
             print(f"Error: Found {len(files)} files in {subdir}. Expected only one.")
     
-    metrics = ["rollout/ep_rew_mean", "train/approx_kl", "train/entropy_loss", "train/loss", "train/old_entropy", "train/policy_gradient_loss", "train/value_loss"]
+    metrics = ["rollout/ep_rew_mean", "train/approx_kl", "train/entropy_loss", "train/loss", "train/old_entropy", "train/policy_gradient_loss", "train/value_loss", "train/std"]
     metrics_dict = {m: ([], []) for m in metrics}
     
     for event_file in event_loader_list:

@@ -10,7 +10,7 @@ from utils.init_pos_config import get_init_list, get_param_names, assert_alarm
 from collections import defaultdict
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-l", "--log_model", help="model to be logged", type=str)
+parser.add_argument("-l", "--log_model", help="model to be logged", type=str) # <log_model>/0_...
 parser.add_argument("-e", "--environment", help="which my- env been used", type=str, required=True)
 parser.add_argument("-p", "--prefix", type=str, default="", help="prefix_name")
 parser.add_argument("-s", "--save_dir", help="directory to save plots", type=str, required=True)
