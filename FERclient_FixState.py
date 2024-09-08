@@ -35,6 +35,8 @@ def paser_argument():
     parser.add_argument("-m", "--time_step", help="training time steps", type=int, default=5e3)
     return parser.parse_args()
 
+# MountainCarFixPos-v0, PendulumFixPos-v0, CartPoleSwingUpFixInitState-v1 are available
+
 class FixPosClient(fl.client.NumPyClient):
     def __init__(self, client_index, args=None):
         
@@ -67,8 +69,8 @@ class FixPosClient(fl.client.NumPyClient):
                     gamma=0.99,
                     verbose=1,
                     target_kl=0.2,
-                    ent_coef=0.,
-                    kl_coef=0.1,
+                    ent_coef=0.1,
+                    kl_coef=0.,
                     vf_coef=0.8,
                     tensorboard_log=self.tensorboard_log,
                     use_advantage = True,

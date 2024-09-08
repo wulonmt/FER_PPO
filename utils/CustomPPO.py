@@ -201,7 +201,7 @@ class CustomPPO(PPO):
                 #Cut the kl_div if larger than kl_target
                 if FER_kl_div is not None and FER_kl_div_value < 2 * self.target_kl:
                     # loss -= self.kl_coef * (self.target_kl - abs(self.target_kl - FER_kl_div))
-                    loss -= self.kl_coef * FER_kl_div
+                    loss += self.kl_coef * FER_kl_div
                 else:
                     continue_training = False
                     if self.verbose >= 1:
